@@ -1,0 +1,37 @@
+
+--[RatingAttributeDetails]
+select * from	[dbo].[RatingAttributeDetails]
+where RatingFID = 1
+
+--[YachtAdditionalServiceDetails]
+select * from	[dbo].[YachtAdditionalServiceDetails] A
+where AdditionalServiceFID = 5
+
+--[YachtCancelPoliMutilLang]
+select * from [dbo].[YachtCancelPoliMutilLang] A
+where CancellationPoliciFID = 3
+
+--[YachtPaymentPoliMutilLang]
+select * from	[dbo].[YachtPaymentPoliMutilLang]
+where PaymentPoliciFID = 4
+
+--[YachtTourCategoryInfomations]
+select * from	[dbo].[YachtTourCategoryInfomations] A
+where TourCategoryFID = 3
+
+--[YachtInformationDetails]
+select * from	[dbo].[YachtInformationDetails] A
+where InformationFID = 40
+
+--[YachtMerchantInformationDetails]
+select * from	[dbo].[YachtMerchantInformationDetails] A
+where InformationFID = 12
+
+--[YachtTourInformationDetails]
+select * from	[dbo].[YachtTourInformationDetails] A
+where InformationFID = 10037
+
+--[YachtRouteMultiLanguages]
+select * from	[dbo].[YachtRouteMultiLanguages] A
+where YachtRouteFID = 50
+

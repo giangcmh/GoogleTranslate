@@ -1,0 +1,23 @@
+--[RatingAttributeDetails]
+select * from	[dbo].[RatingAttributeDetails]
+where RatingFID = 1
+
+--[RoomAmenityAttributeDetails]
+select * from	[dbo].[RoomAmenityAttributeDetails] A
+where RoomAmenitiFID = 1
+
+--[HotelSandboxMutilLang]
+select * from	[dbo].[HotelSandboxMutilLang]
+where SanboxFID = 10
+
+--[HotelAmenityAttributeDetails]
+select * from	[dbo].[HotelAmenityAttributeDetails] A
+where HotelAmenitiFID = 1
+
+--[HotelAdditionalServiceDetails]
+select * from	[dbo].[HotelAdditionalServiceDetails]
+where AdditionalServiceFID = 8
+
+--[HotelInformationDetails]
+select * from	[dbo].[HotelInformationDetails] A
+where InformationFID = 9

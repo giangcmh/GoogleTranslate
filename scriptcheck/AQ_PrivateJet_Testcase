@@ -1,0 +1,13 @@
+--[RatingAttributeDetails]
+select * from	[dbo].[FlightCancelPoliMutilLang]
+where CancellationPoliciFID = 12
+
+--[YachtAdditionalServiceDetails]
+select * from	[dbo].[FlightPaymentPoliMutilLang] A
+where PaymentPoliciFID = 10
+
+--[YachtCancelPoliMutilLang]
+select * from [dbo].[FlightInformationDetails] A
+where InformationFID = 16
+
+

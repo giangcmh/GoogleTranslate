@@ -1,0 +1,19 @@
+--[CarAdditionalServiceDetails]
+select * from	[dbo].[CarAdditionalServiceDetails]
+where AdditionalServiceFID = 6
+
+--[CarCancelPoliMutilLang]
+select * from	[dbo].[CarCancelPoliMutilLang] A
+where CancellationPoliciFID = 3
+
+--[CarPaymentPoliMutilLang]
+select * from [dbo].[CarPaymentPoliMutilLang] A
+where PaymentPoliciFID = 2
+
+--[RatingAttributeDetails]
+select * from	[dbo].[RatingAttributeDetails] A
+where RatingFID = 1
+
+--[CarInformationDetails]
+select * from [dbo].[CarInformationDetails] A
+where InformationFID = 9

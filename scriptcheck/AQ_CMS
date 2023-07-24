@@ -1,0 +1,7 @@
+--[PostCategoryDetails]
+select * from	[dbo].[PostCategoryDetails]
+where PostCategoryFID = 28
+
+--[PostDetails]
+select * from	[dbo].[PostDetails] A
+where PostFId = 106

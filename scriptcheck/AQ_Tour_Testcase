@@ -1,0 +1,88 @@
+--[RatingAttributeDetails]
+select * from	[dbo].[RatingAttributeDetails]
+where RatingFID = 1
+
+--[TourCancelPoliMutilLang]
+select * from	[dbo].[TourCancelPoliMutilLang] A
+where CancellationPoliciFID = 4
+
+--[TourPaymentPoliMutilLang]
+select * from [dbo].[TourPaymentPoliMutilLang] A
+where PaymentPoliciFID = 15
+
+--[TourPricingDetails]
+select * from	[dbo].[TourPricingDetails]
+where PricingFID = 142
+
+--[TourTripPlanDetail]
+select * from	[dbo].[TourTripPlanDetail] A
+where TripPlanFID = 1
+
+--[TourTypeDetail]
+select * from	[dbo].[TourTypeDetail] A
+where TourTypeFID = 13
+
+--[TourInformationDetails]
+select * from	[dbo].[TourInformationDetails] A
+where InformationFID = 55
+
+
+##############################
+select	0 as is_insert,
+        *
+from	[dbo].[RatingAttributeDetails] A
+where	LanguageFID = 1
+and     Deleted = 0
+and     convert(nvarchar(15), COALESCE(LastModifiedDate, CreatedDate),102)
+<= '2020.08.06'
+and RatingFID = 1
+
+select	0 as is_insert,
+        *
+from	[dbo].[TourCancelPoliMutilLang] A
+where	LanguageFID = 1
+and     Deleted = 0
+and     convert(nvarchar(15), COALESCE(LastModifiedDate, CreatedDate),102)
+    <= '2021.06.08'
+
+select	0 as is_insert,
+        *
+from	[dbo].[TourPaymentPoliMutilLang] A
+where	LanguageFID = 1
+and     Deleted = 0
+and     convert(nvarchar(15), COALESCE(LastModifiedDate, CreatedDate),102)
+    <= '2021.06.10'
+
+
+select	0 as is_insert,
+        *
+from	[dbo].[TourPricingDetails] A
+where	LanguageFID = 1
+and     Deleted = 0
+and     convert(nvarchar(15), COALESCE(LastModifiedDate, CreatedDate),102)
+    <= '2021.05.28'
+
+
+select	0 as is_insert,
+        *
+from	[dbo].[TourTripPlanDetail] A
+where	LanguageFID = 1
+and     Deleted = 0
+and     convert(nvarchar(15), COALESCE(LastModifiedDate, CreatedDate),102)
+    <= '2023.07.17'
+
+select	0 as is_insert,
+        *
+from	[dbo].[TourTypeDetail] A
+where	LanguageFID = 1
+and     Deleted = 0
+and     convert(nvarchar(15), COALESCE(LastModifiedDate, CreatedDate),102)
+    <= '2021.10.25'
+
+select	0 as is_insert,
+        *
+from	[dbo].[TourInformationDetails] A
+where	LanguageFID = 1
+and     Deleted = 0
+and     convert(nvarchar(15), COALESCE(LastModifiedDate, ActivatedDate),102)
+    <= '2020.09.09'

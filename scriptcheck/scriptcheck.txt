@@ -1,0 +1,21 @@
+select * from [dbo].[HotelInformationDetails] A where	(LanguageFID = 1 or LanguageFID = 5) and Deleted = 0
+order by InformationFID, LanguageFID
+
+
+select * from [dbo].[RatingAttributeDetails] A where	(LanguageFID = 1 or LanguageFID = 5) and Deleted = 0
+order by RatingFID, LanguageFID
+
+
+select * from [dbo].[RoomAmenityAttributeDetails] A where	(LanguageFID = 1 or LanguageFID = 5) and Deleted = 0
+order by RoomAmenitiFID, LanguageFID
+
+
+select * from [dbo].[HotelSandboxMutilLang] A where	(LanguageFID = 1 or LanguageFID = 5) and Deleted = 0
+order by SanboxFID, LanguageFID
+
+
+select * from [dbo].[HotelAmenityAttributeDetails] A where	(LanguageFID = 1 or LanguageFID = 5) and Deleted = 0
+order by HotelAmenitiFID, LanguageFID
+
+select * from [dbo].[HotelAdditionalServiceDetails] A where	(LanguageFID = 1 or LanguageFID = 5) and Deleted = 0
+order by AdditionalServiceFID, LanguageFID

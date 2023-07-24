@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "useful-cyclist-392603",
+  "private_key_id": "d771ca9a1f193412955fc0f7b2fa36fc14209ef2",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDFNbblNC4OuFad\nHuIaTACjiZ1XYae4m9NaF2aa7JJQZQOn/y/MTO/+ETFGDiDwxPMyCCUMkpPK74wP\nOmx/OdAL6Idps+k6ETWPAVKVdSmU7RqJ3jsvTt80QS+6PVW4Wh2wycHWEHigUs1I\nCjSl8parEbqcPsoU1tYNWJBMjqdmgfjYPLe9xH/ofURcZ5qp3EuK2D6Rhj7EFb0e\nF1rTv4oMB10O496b2z98J24RPS85+pDciyJF2mVzWFsKnIyetlOdEio2SwqB+Ns3\nOoXiMlVTQQn4SB77P7ddTDrDPCDVCHkfwW7u2mOEJ8873HM0zZYaIvWZXeqPOyVG\nf6McsT19AgMBAAECggEABGEJNuU1+ZszxyjipelWoUsCvKg9OG7zXj6DR4DlzdW0\nY1RaDBwQPzDECpVxO09wRAXkxrbxg7HWhxcJxjhzK3SGHz2AugqcSRjjK9Duc7Fh\nI7sUztvePnONGwJWJzIPEzgjrvxuJUc5ajZZzW6J1HIgFeyaAaT0m1bCW4TWaEME\nBbIlPBcSal+Lev2hEjAVks+kS9B6MGftlfcTrejBOnIiH98c/ZYgx3n3tWax4oN8\nZz+sgb/SybaYhZERIWZMx9a9PyO9IpDU+y2G7xmJ23kyR52VSkRR2s53+MusKJkQ\nsCGBNVdcNkhgTLKQJnnAgQJBhHJVkP7tB441qgHuAQKBgQD9eN0t7985ZEkjkrCt\nd1AxuoNcp/7s6Yvf08S5NhxplcFdjoQRXSlcunnSzZbS55s4b6MvmQo1A4KaZtaK\naCp1XVdyUezHSadG29bgYVbh8TP8uMCzvAr1edKUAp/1VxnMEVtb4/G/xB9QCJTc\niGLM19J6gPgYJRkIRyl2k7TrfQKBgQDHLTU+NRqIXLe88zYO35N8vYPJ85h4iA7Q\nP1ftZL2Ip/5ja5MPqV3HNR9vTwNpyVuIrDjHoigCE60TKL/cZbQqOD/e7CeuQSoI\nz5Ra7+iFGrVFC9WKrI/Q3PQVRLJX3OMPLqUrCcDUXYyjbQD8TS0s9PRAvnGEmijL\nKATRl8o6AQKBgAOayGpy0tXaG0AqQeD1pWpPoLacnP95gse4F0AbCORngMx3zmEA\n1im/bSQWUGLHcGmpDMUMhByk5CKV+88UFCZ/IVM63wcmgP58+d1PBRFJgNfDONpV\nfkJnbRs1vlia2H8ScB4qa7GydE+LD7LjLaSEHTYox15wiJ6ZhHlvOE9xAoGBAIN6\nxlDgQTmO6wNiEWdUE0oe2GZx1U6LkivKBMMC41LYgscidhu6k9syqCOUJw6oCzJ3\nbavq0To9vtyM48oboQjVxOPlRHR1M8hJLwewou9qqAqCO16ldvJLSRzZElmJyKF3\nCzUT5STK9FHVXPcwAwhQUwSCMvFzykYBjtzEtIwBAoGARd9reaAcRCBkm7Ix2hZR\nvO4+u8potEAajWXVuaiiAAivOaEf0DvGj3kXvsItMAJCX5LX/w+Qw9jAzeWhqGPC\nYXCi6K+Ichk8hGqoqDN4MidGduOlgpYoxpSHVnsdXhZgHlvj3DFE2LSrGKSJTukK\nsGy+K8zB2MWvlKYV+27h2Ws=\n-----END PRIVATE KEY-----\n",
+  "client_email": "aqtranslate@useful-cyclist-392603.iam.gserviceaccount.com",
+  "client_id": "100290632943147332619",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/aqtranslate%40useful-cyclist-392603.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
