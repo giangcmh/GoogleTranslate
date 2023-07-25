@@ -219,7 +219,7 @@ class CommonFunction:
             for key, value in self.translate_date.items():
                 if self.insert_track[i] == 1:
                     cursor.execute(
-                        f'''INSERT INTO [AQ_Configurations].[dbo].[Translate_Tracking_Log]([Database_Name],
+                        f'''INSERT INTO [AQ_Configurations].[dbo].[Translate_Tracking_Date_Log]([Database_Name],
                                                                                             [Table_Name],
                                                                                             [LastTranlastedDate])
                             VALUES (?,?,?)
@@ -233,7 +233,7 @@ class CommonFunction:
             for key, value in self.exception_translate_date.items():
                 if self.exception_insert_track[i] == 1:
                     cursor.execute(
-                        f'''INSERT INTO [AQ_Configurations].[dbo].[Translate_Tracking_Log]([Database_Name],
+                        f'''INSERT INTO [AQ_Configurations].[dbo].[Translate_Tracking_Date_Log]([Database_Name],
                                                                                             [Table_Name],
                                                                                             [LastTranlastedDate])
                             VALUES (?,?,?)
