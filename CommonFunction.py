@@ -83,6 +83,7 @@ class CommonFunction:
                                 {key} as translatefid,
                                 '{value}' as language_translate,
                                 '{translate_key}' as table_name,
+                                0 as world_translated,
                                 * 
                         from	[dbo].[{translate_key}] A 
                         where	LanguageFID = 1 
@@ -91,7 +92,7 @@ class CommonFunction:
                                             where A.{translate_value[1]} = B.{translate_value[1]} 
                                             and B.LanguageFID = {key}) 
                         and     Deleted = 0
-                        and		PostCategoryFID = 1
+                        and		PostCategoryFID in (1, 27)
                     '''
                     , self.cnxn, index_col='ID')
                 self.normal_df = pd.concat([self.normal_df, normal_insert], ignore_index=True)
@@ -102,13 +103,14 @@ class CommonFunction:
                                 {key} as translatefid,
                                 '{value}' as language_translate,
                                 '{translate_key}' as table_name,
+                                0 as world_translated,
                                 * 
                         from	[dbo].[{translate_key}] A 
                         where	LanguageFID = 1 
                         and     Deleted = 0 
                         and     convert(nvarchar(15), COALESCE(LastModifiedDate, CreatedDate),102)
                             <= '{translate_value[1]}'
-                        and		PostCategoryFID = 1
+                        and		PostCategoryFID in (1, 27)
                     '''
                     , self.cnxn, index_col='ID')
                 self.normal_df = pd.concat([self.normal_df, normal_update], ignore_index=True)
@@ -128,6 +130,7 @@ class CommonFunction:
                                 {key} as translatefid,
                                 '{value}' as language_translate,
                                 '{translate_key}' as table_name,
+                                0 as world_translated,
                                 * 
                         from	[dbo].[{translate_key}] A 
                         where	LanguageFID = 1 
@@ -147,6 +150,7 @@ class CommonFunction:
                                 {key} as translatefid,
                                 '{value}' as language_translate,
                                 '{translate_key}' as table_name,
+                                0 as world_translated,
                                 * 
                         from	[dbo].[{translate_key}] A 
                         where	LanguageFID = 1 
@@ -169,7 +173,6 @@ class CommonFunction:
 
     def call_api_translate(self):
         self.normal_df, self.exception_df = self.get_data_frame()
-
         for key, value in self.tables.items():
             for i in range(0,len(value[1])):
                 self.normal_list_column.append(value[1][i])
@@ -179,27 +182,34 @@ class CommonFunction:
                 self.exception_list_column.append(value[1][i])
 
         for index, row in self.normal_df.iterrows():
+            word_translated = 0
             for i in range(0,len(self.normal_list_column)):
                 language_translate = row['language_translate']
                 column_name = self.normal_list_column[i]
                 text_description = row[f'{column_name}']
+                word_translated += len(text_description)
+
                 # process NULL data in column
                 if text_description != None:
                     output_description = self.translate_client.translate(text_description,
                                                                         target_language=language_translate)
                     self.normal_df.at[index, f'{column_name}'] = output_description['translatedText']
+            # self.normal_df.iloc[index]['word_translated']= word_translated
+            self.normal_df.at[index, 'after_word_translated'] = word_translated
 
         for index, row in self.exception_df.iterrows():
+            word_translated = 0
             for i in range(0,len(self.exception_list_column)):
                 language_translate = row['language_translate']
                 column_name = self.exception_list_column[i]
                 text_description = row[f'{column_name}']
+                word_translated += len(text_description)
                 # process NULL data in column
                 if text_description != None:
                     output_description = self.translate_client.translate(text_description,
                                                                         target_language=language_translate)
                     self.exception_df.at[index, f'{column_name}'] = output_description['translatedText']
-
+            self.exception_df.at[index, 'after_word_translated'] = word_translated
         return self.normal_df, self.exception_df
 
     def insert_tracking_log(self):
@@ -232,3 +242,48 @@ class CommonFunction:
                         key,
                         value[0]
                     )
+
+    def insert_tracking_row_and_word(self):
+        # self.normal_df, self.exception_df = self.call_api_translate()
+        tracking_normal_df = self.normal_df.groupby('table_name') \
+                                            .agg({'is_insert': 'count',
+                                                  'after_word_translated': 'sum'}) \
+                                            .reset_index() \
+                                            .rename(columns={'is_insert': 'row_count'})
+
+        tracking_exception_df = self.exception_df.groupby('table_name') \
+                                                    .agg({'is_insert': 'count',
+                                                          'after_word_translated': 'sum'}) \
+                                                    .reset_index() \
+                                                    .rename(columns={'is_insert': 'row_count'})
+        cursor = self.cnxn.cursor()
+        # normal
+        for index, row in tracking_normal_df.iterrows():
+            cursor.execute(
+                f'''INSERT INTO [AQ_Configurations].[dbo].[Translate_Tracking_RowAndWord_Log]([Database_Name],
+                                                                                            [Table_Name],
+                                                                                            [Translated_Row],
+                                                                                            [Translated_Word],
+                                                                                            [CreatedDate])
+                            VALUES (?,?,?,?,getdate())
+                        ''',
+                self.databasename,
+                row['table_name'],
+                row['row_count'],
+                row['after_word_translated']
+            )
+        # exception
+        for index, row in tracking_exception_df.iterrows():
+            cursor.execute(
+                f'''INSERT INTO [AQ_Configurations].[dbo].[Translate_Tracking_RowAndWord_Log]([Database_Name],
+                                                                                            [Table_Name],
+                                                                                            [Translated_Row],
+                                                                                            [Translated_Word],
+                                                                                            [CreatedDate])
+                            VALUES (?,?,?,?,getdate())
+                        ''',
+                self.databasename,
+                row['table_name'],
+                row['row_count'],
+                row['after_word_translated']
+            )

@@ -289,6 +289,7 @@ for index, row in restaurantotherinformations.iterrows():
 
 # Insert tracking log into Translate_Tracking_Log
 commonfunction.insert_tracking_log()
+commonfunction.insert_tracking_row_and_word()
 
 cnxn.commit()
 cursor.close()

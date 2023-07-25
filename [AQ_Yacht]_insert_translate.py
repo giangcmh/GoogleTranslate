@@ -568,6 +568,7 @@ for index, row in yachtroutemultilanguages.iterrows():
 
 # Insert tracking log into Translate_Tracking_Log
 commonfunction.insert_tracking_log()
+commonfunction.insert_tracking_row_and_word()
 
 #For yachtroutemultilanguages
 if yachtroutemultilanguages.empty == False:

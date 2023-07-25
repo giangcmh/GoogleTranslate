@@ -45,8 +45,14 @@ translate_date, exception_translate_date = commonfunction.get_last_translated_da
 # print(exception_translate_date)
 
 ################################################################# Get dataframe
-normal_df, exception_df = commonfunction.get_data_frame()
+
 # print(normal_df.shape)
 # print(exception_df.shape)
 
-print('abc')
+############################################################## Call Function Translate
+normal_df, exception_df = commonfunction.call_api_translate()
+# print(normal_df.head(15))
+# print(exception_df)
+
+############################################################### Tracking Count Rows & Word
+commonfunction.insert_tracking_row_and_word()
