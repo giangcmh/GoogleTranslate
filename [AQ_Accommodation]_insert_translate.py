@@ -10,13 +10,16 @@ warnings.filterwarnings('ignore')
 #################################################################
 # declare database name and table name
 databasename = 'AQ_Accommodation'
-normal_tables = {'RatingAttributeDetails': ['PostCategoryFID', ['Name']],
-                 'RoomAmenityAttributeDetails': ['PostCategoryFID', ['Name']],
-                 'HotelSandboxMutilLang': ['PostCategoryFID', ['Name']],
-                 'HotelAmenityAttributeDetails': ['PostCategoryFID', ['Name']],
-                 'HotelAdditionalServiceDetails': ['PostCategoryFID', ['Name']]
+
+
+normal_tables = {'RatingAttributeDetails': ['RatingFID', ['Name']],
+                 'RoomAmenityAttributeDetails': ['RoomAmenitiFID', ['Name']],
+                 'HotelSandboxMutilLang': ['SanboxFID', ['SanboxDescription', 'SandboxPolicies', 'SanboxShortDescription']],
+                 'HotelAmenityAttributeDetails': ['HotelAmenitiFID', ['Name']],
+                 'HotelAdditionalServiceDetails': ['AdditionalServiceFID', ['Name']],
+                 'HotelInventoryDescriptions': ['InventoryId', ['Description']]
                  }
-exception_tables = {'HotelInformationDetails': ['PostCategoryFID', ['Name']]
+exception_tables = {'HotelInformationDetails': ['InformationFID', ['Title','ShortDescriptions','FullDescriptions']]
                     }
 
 language = {
@@ -72,6 +75,7 @@ else:
         hotelamenityattributedetails = normal_df[normal_df['table_name'] == 'HotelAmenityAttributeDetails']
         hoteladditionalservicedetails = normal_df[normal_df['table_name'] == 'HotelAdditionalServiceDetails']
         hotelinformationdetails = exception_df[exception_df['table_name'] == 'HotelInformationDetails']
+        hotelinventorydescriptions = normal_df[normal_df['table_name'] == 'HotelInventoryDescriptions']
 
         # RatingAttributeDetails
         for index, row in ratingattributedetails.iterrows():
@@ -91,7 +95,7 @@ else:
                     ''',
                     row.RatingFID,
                     row.translatefid,
-                    row.Description_Translated,
+                    row.Name,
                     row.Remark,
                     row.IsActive,
                     row.Deleted,
@@ -106,7 +110,7 @@ else:
                         WHERE   RatingFID = ? 
                         and     LanguageFID = ?
                     ''',
-                    row.Description_Translated,
+                    row.Name,
                     row.RatingFID,
                     row.translatefid
                 )
@@ -141,7 +145,7 @@ else:
                     ''',
                     row.RoomAmenitiFID,
                     row.translatefid,
-                    row.Description_Translated,
+                    row.Name,
                     row.Remark,
                     row.IsActive,
                     row.Deleted,
@@ -156,7 +160,7 @@ else:
                         WHERE   RoomAmenitiFID = ? 
                         and     LanguageFID = ?
                     ''',
-                    row.Description_Translated,
+                    row.Name,
                     row.RoomAmenitiFID,
                     row.translatefid
                 )
@@ -194,13 +198,13 @@ else:
                     row.SanboxFID,
                     row.translatefid,
                     row.SanboxName,
-                    row.Description_Translated,
+                    row.SanboxDescription,
                     row.IsActivated,
                     row.Deleted,
                     row.CreatedBy,
                     row.LastModifiedBy,
-                    row.Policies_Translated,
-                    row.ShortDescription_Translated
+                    row.SandboxPolicies,
+                    row.SanboxShortDescription
                     )
             else:
                 cursor.execute(
@@ -212,9 +216,9 @@ else:
                         WHERE SanboxFID = ? 
                         and LanguageFID = ?
                     ''',
-                    row.Description_Translated,
-                    row.Policies_Translated,
-                    row.ShortDescription_Translated,
+                    row.SanboxDescription,
+                    row.SandboxPolicies,
+                    row.SanboxShortDescription,
                     row.SanboxFID,
                     row.translatefid
                 )
@@ -249,7 +253,7 @@ else:
                     ''',
                     row.HotelAmenitiFID,
                     row.translatefid,
-                    row.Description_Translated,
+                    row.Name,
                     row.Remark,
                     row.IsActive,
                     row.Deleted,
@@ -264,7 +268,7 @@ else:
                         WHERE   HotelAmenitiFID = ? 
                         and LanguageFID = ?
                     ''',
-                    row.Description_Translated,
+                    row.Name,
                     row.HotelAmenitiFID,
                     row.translatefid
                 )
@@ -298,7 +302,7 @@ else:
                     ''',
                     row.AdditionalServiceFID,
                     row.translatefid,
-                    row.Description_Translated,
+                    row.Name,
                     row.Remark,
                     row.Deleted,
                     row.CreatedBy,
@@ -312,7 +316,7 @@ else:
                         WHERE   AdditionalServiceFID = ? 
                         and     LanguageFID = ?
                     ''',
-                    row.Description_Translated,
+                    row.Name,
                     row.AdditionalServiceFID,
                     row.translatefid
                 )
@@ -327,6 +331,51 @@ else:
                     1  # language en-US
                 )
 
+        #HotelInventoryDescriptions
+        for index, row in hotelinventorydescriptions.iterrows():
+            if row.is_insert == 1:
+                cursor.execute(
+                    '''INSERT INTO [dbo].[HotelInventoryDescriptions]([InventoryId],
+                                                                [LanguageFID],
+                                                                [Name],
+                                                                [Description],
+                                                                [Deleted],
+                                                                [CreatedDate],
+                                                                [CreatedBy],
+                                                                [LastModifiedDate],
+                                                                [LastModifiedBy])
+                        VALUES (?,?,?,?,?,getdate(),?,getdate()-1,?)
+                    ''',
+                    row.InventoryId,
+                    row.translatefid,
+                    row.Name,
+                    row.Description,
+                    row.Deleted,
+                    row.CreatedBy,
+                    row.LastModifiedBy
+                    )
+            else:
+                cursor.execute(
+                    ''' UPDATE  [dbo].[HotelInventoryDescriptions] 
+                        SET     Description = ?, 
+                                LastModifiedDate = getdate()
+                        WHERE   InventoryId = ? 
+                        and     LanguageFID = ?
+                    ''',
+                    row.Description,
+                    row.InventoryId,
+                    row.translatefid
+                )
+                # update language en-US = getdate
+                cursor.execute(
+                    ''' UPDATE [dbo].[HotelInventoryDescriptions] 
+                        SET	    LastModifiedDate = getdate()
+                        WHERE   InventoryId = ? 
+                        and     LanguageFID = ?
+                    ''',
+                    row.InventoryId,
+                    1  # language en-US
+                )
 
         # hotelinformationdetails
         for index, row in hotelinformationdetails.iterrows():
@@ -353,9 +402,9 @@ else:
                     row.translatefid,
                     row.FileTypeFID,
                     row.FileStreamFID,
-                    row.Title_Translated,
-                    row.ShortDescription_Translated,
-                    row.Description_Translated,
+                    row.Title,
+                    row.ShortDescriptions,
+                    row.FullDescriptions,
                     row.Deleted,
                     row.IsActivated,
                     row.ActivatedBy,
@@ -371,9 +420,9 @@ else:
                         WHERE   InformationFID = ? 
                         and     LanguageFID = ?
                     ''',
-                    row.Title_Translated,
-                    row.ShortDescription_Translated,
-                    row.Description_Translated,
+                    row.Title,
+                    row.ShortDescriptions,
+                    row.FullDescriptions,
                     row.InformationFID,
                     row.translatefid
                 )
@@ -389,15 +438,15 @@ else:
                 )
 
         # Insert tracking log into Translate_Tracking_Log
-        commonfunction.insert_tracking_log()
-        commonfunction.insert_tracking_row_and_word()
+        if normal_df.isnull == 'False' or exception_df.isnull == 'False':
+            commonfunction.insert_tracking_row_and_word(normal_df, exception_df)
 
         cnxn.commit()
         cursor.close()
     except:
         cursor = cnxn.cursor()
         cursor.execute(
-            f'''INSERT INTO [AQ_Configurations].[dbo].[Translate_Tracking_RowAndWord_Log]([Database_Name],
+            f'''INSERT INTO [AQ_Configurations].[dbo].[Translate_Tracking_Status_Log]([Database_Name],
                                                                                                     [Status],
                                                                                                     [CreatedDate])
                                     VALUES (?,?,getdate())
@@ -410,7 +459,7 @@ else:
     else:
         cursor = cnxn.cursor()
         cursor.execute(
-            f'''INSERT INTO [AQ_Configurations].[dbo].[Translate_Tracking_RowAndWord_Log]([Database_Name],
+            f'''INSERT INTO [AQ_Configurations].[dbo].[Translate_Tracking_Status_Log]([Database_Name],
                                                                                                         [Status],
                                                                                                         [CreatedDate])
                                         VALUES (?,?,getdate())

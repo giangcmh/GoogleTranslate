@@ -37,7 +37,7 @@ class CommonFunction:
                                         from	cte_get_10_date_asc
                                         UNION ALL
                                         select	max([LastTranlastedDate])
-                                        from	[AQ_Configurations].[dbo].[Translate_Tracking_Log]
+                                        from	[AQ_Configurations].[dbo].[Translate_Tracking_Date_Log]
                                         where	[Database_Name] = '{self.databasename}'
                                         and		[Table_Name] = '{key}'
                                         )
@@ -60,7 +60,7 @@ class CommonFunction:
                                         from	cte_get_10_date_asc
                                         UNION ALL
                                         select	max([LastTranlastedDate])
-                                        from	[AQ_Configurations].[dbo].[Translate_Tracking_Log]
+                                        from	[AQ_Configurations].[dbo].[Translate_Tracking_Date_Log]
                                         where	[Database_Name] = '{self.databasename}'
                                         and		[Table_Name] = '{key}'
                                         )
@@ -92,7 +92,7 @@ class CommonFunction:
                                             where A.{translate_value[1]} = B.{translate_value[1]} 
                                             and B.LanguageFID = {key}) 
                         and     Deleted = 0
-                        and		PostCategoryFID in (1, 27)
+                        
                     '''
                     , self.cnxn, index_col='ID')
                 self.normal_df = pd.concat([self.normal_df, normal_insert], ignore_index=True)
@@ -110,7 +110,7 @@ class CommonFunction:
                         and     Deleted = 0 
                         and     convert(nvarchar(15), COALESCE(LastModifiedDate, CreatedDate),102)
                             <= '{translate_value[1]}'
-                        and		PostCategoryFID in (1, 27)
+                        
                     '''
                     , self.cnxn, index_col='ID')
                 self.normal_df = pd.concat([self.normal_df, normal_update], ignore_index=True)
@@ -139,7 +139,7 @@ class CommonFunction:
                                         where A.{translate_value[1]} = B.{translate_value[1]} 
                                         and B.LanguageFID = {key}) 
                         and     Deleted = 0
-                        and		PostFId = 89
+                        
                     '''
                     , self.cnxn, index_col='ID')
                 self.exception_df = pd.concat([self.exception_df, exception_insert], ignore_index=True)
@@ -157,7 +157,7 @@ class CommonFunction:
                         and     Deleted = 0 
                         and     convert(nvarchar(15), COALESCE(LastModifiedDate, ActivatedDate),102)
                             <= '{translate_value[1]}'
-                        and		PostFId = 89
+                        
                     '''
                     , self.cnxn, index_col='ID')
                 self.exception_df = pd.concat([self.exception_df, exception_update], ignore_index=True)
@@ -243,15 +243,15 @@ class CommonFunction:
                         value[0]
                     )
 
-    def insert_tracking_row_and_word(self):
+    def insert_tracking_row_and_word(self,normal_df, exception_df):
         # self.normal_df, self.exception_df = self.call_api_translate()
-        tracking_normal_df = self.normal_df.groupby('table_name') \
+        tracking_normal_df = normal_df.groupby('table_name') \
                                             .agg({'is_insert': 'count',
                                                   'after_word_translated': 'sum'}) \
                                             .reset_index() \
                                             .rename(columns={'is_insert': 'row_count'})
 
-        tracking_exception_df = self.exception_df.groupby('table_name') \
+        tracking_exception_df = exception_df.groupby('table_name') \
                                                     .agg({'is_insert': 'count',
                                                           'after_word_translated': 'sum'}) \
                                                     .reset_index() \

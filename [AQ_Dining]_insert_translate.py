@@ -91,7 +91,7 @@ else:
                     ''',
                     row.RatingFID,
                     row.language_translate,
-                    row.Description_Translated,
+                    row.Name,
                     row.Remark,
                     row.IsActive,
                     row.Deleted,
@@ -106,7 +106,7 @@ else:
                         WHERE   RatingFID = ? 
                         and LanguageFID = ?
                     ''',
-                    row.Description_Translated,
+                    row.Name,
                     row.RatingFID,
                     row.language_translate
                 )
@@ -139,8 +139,8 @@ else:
                     ''',
                     row.CancellationPoliciFID,
                     row.language_translate,
-                    row.Description_Translated,
-                    row.TermAndPolicies_Translated,
+                    row.Name,
+                    row.TermAndPolicies,
                     row.IsActive,
                     row.Deleted,
                     row.CreatedBy,
@@ -155,8 +155,8 @@ else:
                         WHERE   CancellationPoliciFID = ? 
                         and     LanguageFID = ?
                     ''',
-                    row.Description_Translated,
-                    row.TermAndPolicies_Translated,
+                    row.Name,
+                    row.TermAndPolicies,
                     row.CancellationPoliciFID,
                     row.language_translate
                 )
@@ -198,9 +198,9 @@ else:
                     row.LanguageResKey,
                     row.FileTypeFID,
                     row.FileStreamFID,
-                    row.Title_Translated,
-                    row.ShortDescription_Translated,
-                    row.Description_Translated,
+                    row.Title,
+                    row.ShortDescriptions,
+                    row.FullDescriptions,
                     row.Deleted,
                     row.IsActivated,
                     row.ActivatedBy,
@@ -216,9 +216,9 @@ else:
                         WHERE   InformationFID = ? 
                         and LanguageFID = ?
                     ''',
-                    row.Title_Translated,
-                    row.ShortDescription_Translated,
-                    row.Description_Translated,
+                    row.Title,
+                    row.ShortDescriptions,
+                    row.FullDescriptions,
                     row.InformationFID,
                     row.language_translate
                 )
@@ -263,8 +263,8 @@ else:
                     row.LanguageResKey,
                     row.FileTypeFID,
                     row.FileStreamFID,
-                    row.Title_Translated,
-                    row.Description_Translated,
+                    row.Title,
+                    row.Descriptions,
                     row.Deleted,
                     row.IsActivated,
                     row.ActivatedBy,
@@ -280,8 +280,8 @@ else:
                         WHERE   RestaurantFID = ? 
                         and LanguageFID = ?
                     ''',
-                    row.Title_Translated,
-                    row.Description_Translated,
+                    row.Title,
+                    row.Descriptions,
                     row.RestaurantFID,
                     row.language_translate
                 )
@@ -297,8 +297,8 @@ else:
                 )
 
         # Insert tracking log into Translate_Tracking_Log
-        commonfunction.insert_tracking_log()
-        commonfunction.insert_tracking_row_and_word()
+        if normal_df.isnull == 'False' or exception_df.isnull == 'False':
+            commonfunction.insert_tracking_row_and_word(normal_df, exception_df)
 
         cnxn.commit()
         cursor.close()

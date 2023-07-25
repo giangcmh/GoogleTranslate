@@ -6,36 +6,40 @@ import warnings
 from CommonFunction import CommonFunction
 
 warnings.filterwarnings('ignore')
-pd.set_option('display.max_columns', None)  # show all columns in pandas dataframe
 
 #################################################################
-# init credentials google translate api
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = r"D:\PythonProject\GoogleTranslate\elaborate-art-392802-e18eac2a2238.json"
+# declare database name and table name
+databasename = 'AQ_IdentityBookingPortal'
+# 'HelpTypeDedatails': ['HelpTypeFID', ['Name']]
+normal_tables = {'HelpContentsDetails': ['HelpContentFID', ['Title','FullDescriptions']]
+
+                 }
+exception_tables = {
+                    }
+language = {
+            2: "zh-CN",
+            4: "th",
+            6: "zh-TW",
+            5: "vi"
+        }
+
 
 # init connection SQL Server
 cnxn = pyodbc.connect("Driver={SQL Server Native Client 11.0};"
-                         "Server=(local);"
-                         "Database=AQ_CMS;"
-                         "uid=translate;"
-                         "pwd=456wsx765&*;",
-                         autocommit=True
-                         )
+                      "Server=69.172.67.3,1400;"
+                      "Database=AQ_IdentityBookingPortal;"
+                      "uid=translate;"
+                      "pwd=456wsx765&*;",
+                      autocommit=True
+                      )
+
+# init credentials google translate api
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = r"D:\PythonProject\GoogleTranslate\elaborate-art-392802-e18eac2a2238.json"
 
 # init translate language
 translate_client = translate_v2.Client()
 
-language = {
-    2: "zh-CN",
-    4: "th",
-    6: "zh-TW",
-    5: "vi"
-}
-
-# declare database name and table name
-databasename = 'AQ_CMS'
-normal_tables = {'PostCategoryDetails': ['PostCategoryFID',['Name']]}
-exception_tables = {'PostDetails': ['PostFId',['Title','Body','ShortDescription']]}
-commonfunction = CommonFunction(databasename,normal_tables, exception_tables, language, cnxn, translate_client)
+commonfunction = CommonFunction(databasename, normal_tables, exception_tables, language, cnxn, translate_client)
 
 #################################################################  Get Last Translated Date
 translate_date, exception_translate_date = commonfunction.get_last_translated_date()
@@ -54,129 +58,133 @@ normal_df, exception_df = commonfunction.call_api_translate()
 # print(exception_df)
 
 ################################################################# Insert dataframe into tables
+
 cursor = cnxn.cursor()
 
-postcategorydetails = normal_df[normal_df['table_name'] == 'PostCategoryDetails']
-postdetails = exception_df[exception_df['table_name'] == 'PostDetails']
+helpcontentsdetails = normal_df[normal_df['table_name'] == 'HelpContentsDetails']
+helptypededatails = normal_df[normal_df['table_name'] == 'HelpTypeDedatails']
 
-# PostCategoryDetails
-for index, row in postcategorydetails.iterrows():
+# HelpContentsDetails
+for index, row in helpcontentsdetails.iterrows():
     if row.is_insert == 1:
         cursor.execute(
-            '''INSERT INTO [dbo].[PostCategoryDetails]([PostCategoryFID],
-                                                        [Name],
-                                                        [LanguageFID],
+            '''INSERT INTO [dbo].[HelpContentsDetails]([LanguageFID],
+                                                        [HelpContentFID],
+                                                        [Title],
+                                                        [ShortDescriptions],
+                                                        [FullDescriptions],
                                                         [Deleted],
-                                                        [IsActivated],
+                                                        [IsActived],
                                                         [CreatedBy],
                                                         [CreatedDate],
                                                         [LastModifiedBy],
-                                                        [LastModifiedDate],
-                                                        [FriendlyUrl])
-                VALUES (?,?,?,?,?,?,getdate(),?,getdate()-1,?)
+                                                        [LastModifiedDate]) 
+                VALUES (?,?,?,?,?,?,?,?,getdate(),?,getdate()-1)
             ''',
-            row.PostCategoryFID,
-            row.Description_Translated,
             row.translatefid,
+            row.HelpContentFID,
+            row.Title,
+            row.ShortDescriptions,
+            row.FullDescriptions,
             row.Deleted,
-            row.IsActivated,
+            row.IsActived,
             row.CreatedBy,
-            row.LastModifiedBy,
-            row.FriendlyUrl
+            row.LastModifiedBy
             )
     else:
         cursor.execute(
-            ''' UPDATE [dbo].[PostCategoryDetails]
-                SET	    Name = ?,
+            ''' UPDATE [dbo].[HelpContentsDetails] 
+                SET	    Title = ?, 
+                        FullDescriptions = ?, 
                         LastModifiedDate = getdate()
-                WHERE   PostCategoryFID = ?
-                and     LanguageFID = ?
+                WHERE   HelpContentFID = ? and LanguageFID = ?
             ''',
-            row.Description_Translated,
-            row.PostCategoryFID,
+            row.Title,
+            row.FullDescriptions,
+            row.HelpContentFID,
             row.translatefid
         )
         # update language en-US = getdate
         cursor.execute(
-            ''' UPDATE [dbo].[PostCategoryDetails]
+            ''' UPDATE [dbo].[HelpContentsDetails] 
                 SET	    LastModifiedDate = getdate()
-                WHERE   PostCategoryFID = ?
+                WHERE   HelpContentFID = ? 
                 and     LanguageFID = ?
             ''',
-            row.PostCategoryFID,
+            row.HelpContentFID,
             1  # language en-US
         )
 
-# PostDetails
-for index, row in postdetails.iterrows():
+# HelpTypeDedatails
+for index, row in helptypededatails.iterrows():
     if row.is_insert == 1:
         cursor.execute(
-            '''INSERT INTO [dbo].[PostDetails]([UniqueId],
-                                                [PostFId],
-                                                [LanguageFID],
-                                                [FileTypeFID],
-                                                [FileStreamFID],
-                                                [Title],
-                                                [MetaDescription],
-                                                [Body],
-                                                [KeyWord],
-                                                [Deleted],
-                                                [IsActivated],
-                                                [ActivatedDate],
-                                                [ActivatedBy],
-                                                [LastModifiedBy],
-                                                [LastModifiedDate],
-                                                [ShortDescription],
-                                                [FriendlyUrl]) 
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,getdate(),?,?,getdate()-1,?,?)
+            '''INSERT INTO [dbo].[HelpTypeDedatails]([LanguageFID],
+                                                    [HelpTypeFID],
+                                                    [Name],
+                                                    [Remarks],
+                                                    [Deleted],
+                                                    [IsActived],
+                                                    [CreatedBy],
+                                                    [CreatedDate],
+                                                    [LastModifiedBy],
+                                                    [LastModifiedDate]) 
+                VALUES (?,?,?,?,?,?,?,getdate(),?,getdate()-1)
             ''',
-            row.UniqueId,
-            row.PostFId,
             row.translatefid,
-            row.FileTypeFID,
-            row.FileStreamFID,
-            row.Title_Translated,
-            row.MetaDescription_Translated,
-            row.Body_Translated,
-            row.KeyWord,
+            row.HelpTypeFID,
+            row.Name,
+            row.Remarks,
             row.Deleted,
-            row.IsActivated,
-            row.ActivatedBy,
-            row.LastModifiedBy,
-            row.ShortDescription_Translated,
-            row.FriendlyUrl
+            row.IsActived,
+            row.CreatedBy,
+            row.LastModifiedBy
             )
     else:
         cursor.execute(
-            ''' UPDATE [dbo].[PostDetails] 
-                SET	    Title = ?, 
-                        MetaDescription = ?, 
-                        Body = ?, 
-                        ShortDescription = ?, 
-                        LastModifiedDate = getdate()  
-                WHERE   PostFId = ? 
+            ''' UPDATE [dbo].[HelpTypeDedatails] 
+                SET	    Name = ?, 
+                        LastModifiedDate = getdate()
+                WHERE   HelpTypeFID = ? 
                 and     LanguageFID = ?
             ''',
-            row.Title_Translated,
-            row.MetaDescription_Translated,
-            row.Body_Translated,
-            row.ShortDescription_Translated,
-            row.PostFId,
+            row.Name,
+            row.HelpTypeFID,
             row.translatefid
         )
         # update language en-US = getdate
         cursor.execute(
-            ''' UPDATE [dbo].[PostDetails] 
+            ''' UPDATE [dbo].[HelpTypeDedatails] 
                 SET	    LastModifiedDate = getdate()
-                WHERE   PostFId = ? 
+                WHERE   HelpTypeFID = ? 
                 and     LanguageFID = ?
             ''',
-            row.PostFId,
+            row.HelpTypeFID,
             1  # language en-US
         )
 
 # Insert tracking log into Translate_Tracking_Log
 commonfunction.insert_tracking_log()
+if normal_df.isnull == 'False' or exception_df.isnull == 'False':
+    commonfunction.insert_tracking_row_and_word(normal_df, exception_df)
 
 cnxn.commit()
 cursor.close()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

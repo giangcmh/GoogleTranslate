@@ -87,7 +87,7 @@ else:
                     ''',
                     row.AdditionalServiceFID,
                     row.translatefid,
-                    row.Description_Translated,
+                    row.Name,
                     row.Remark,
                     row.Deleted,
                     row.CreatedBy,
@@ -100,7 +100,7 @@ else:
                                 LastModifiedDate = getdate()  
                         WHERE AdditionalServiceFID = ? and LanguageFID = ?
                     ''',
-                    row.Description_Translated,
+                    row.Name,
                     row.AdditionalServiceFID,
                     row.translatefid
                 )
@@ -134,8 +134,8 @@ else:
                     ''',
                     row.CancellationPoliciFID,
                     row.translatefid,
-                    row.Description_Translated,
-                    row.TermAndPolicies_Translated,
+                    row.Name,
+                    row.TermAndPolicies,
                     row.IsActive,
                     row.Deleted,
                     row.CreatedBy,
@@ -150,8 +150,8 @@ else:
                         WHERE   CancellationPoliciFID = ? 
                         and     LanguageFID = ?
                     ''',
-                    row.Description_Translated,
-                    row.TermAndPolicies_Translated,
+                    row.Name,
+                    row.TermAndPolicies,
                     row.CancellationPoliciFID,
                     row.translatefid
                 )
@@ -185,8 +185,8 @@ else:
                     ''',
                     row.PaymentPoliciFID,
                     row.translatefid,
-                    row.Description_Translated,
-                    row.TermAndPolicies_Translated,
+                    row.Name,
+                    row.TermAndPolicies,
                     row.IsActive,
                     row.Deleted,
                     row.CreatedBy,
@@ -236,7 +236,7 @@ else:
                     ''',
                     row.RatingFID,
                     row.translatefid,
-                    row.Description_Translated,
+                    row.Name,
                     row.Remark,
                     row.IsActive,
                     row.Deleted,
@@ -293,9 +293,9 @@ else:
                     row.translatefid,
                     row.FileTypeFID,
                     row.FileStreamFID,
-                    row.Title_Translated,
-                    row.ShortDescription_Translated,
-                    row.Description_Translated,
+                    row.Title,
+                    row.ShortDescriptions,
+                    row.FullDescriptions,
                     row.Deleted,
                     row.IsActivated,
                     row.ActivatedBy,
@@ -311,9 +311,9 @@ else:
                         WHERE   InformationFID = ? 
                         and     LanguageFID = ?
                     ''',
-                    row.Title_Translated,
-                    row.ShortDescription_Translated,
-                    row.Description_Translated,
+                    row.Title,
+                    row.ShortDescriptions,
+                    row.FullDescriptions,
                     row.InformationFID,
                     row.translatefid
                 )
@@ -329,8 +329,8 @@ else:
                 )
 
         # Insert tracking log into Translate_Tracking_Log
-        commonfunction.insert_tracking_log()
-        commonfunction.insert_tracking_row_and_word()
+        if normal_df.isnull == 'False' or exception_df.isnull == 'False':
+            commonfunction.insert_tracking_row_and_word(normal_df, exception_df)
 
         cnxn.commit()
         cursor.close()

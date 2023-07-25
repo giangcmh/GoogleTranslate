@@ -80,7 +80,7 @@ else:
                         VALUES (?,?,?,?,?,?,getdate(),?,getdate()-1,?)
                     ''',
                     row.PostCategoryFID,
-                    row.Description_Translated,
+                    row.Name,
                     row.translatefid,
                     row.Deleted,
                     row.IsActivated,
@@ -96,7 +96,7 @@ else:
                         WHERE   PostCategoryFID = ?
                         and     LanguageFID = ?
                     ''',
-                    row.Description_Translated,
+                    row.Name,
                     row.PostCategoryFID,
                     row.translatefid
                 )
@@ -139,15 +139,15 @@ else:
                     row.translatefid,
                     row.FileTypeFID,
                     row.FileStreamFID,
-                    row.Title_Translated,
-                    row.MetaDescription_Translated,
-                    row.Body_Translated,
+                    row.Title,
+                    row.MetaDescription,
+                    row.Body,
                     row.KeyWord,
                     row.Deleted,
                     row.IsActivated,
                     row.ActivatedBy,
                     row.LastModifiedBy,
-                    row.ShortDescription_Translated,
+                    row.ShortDescription,
                     row.FriendlyUrl
                     )
             else:
@@ -161,10 +161,10 @@ else:
                         WHERE   PostFId = ? 
                         and     LanguageFID = ?
                     ''',
-                    row.Title_Translated,
-                    row.MetaDescription_Translated,
-                    row.Body_Translated,
-                    row.ShortDescription_Translated,
+                    row.Title,
+                    row.MetaDescription,
+                    row.Body,
+                    row.ShortDescription,
                     row.PostFId,
                     row.translatefid
                 )
@@ -180,8 +180,8 @@ else:
                 )
 
         # Insert tracking log into Translate_Tracking_Log
-        commonfunction.insert_tracking_log()
-        commonfunction.insert_tracking_row_and_word()
+        if normal_df.isnull == 'False' or exception_df.isnull == 'False':
+            commonfunction.insert_tracking_row_and_word(normal_df, exception_df)
 
         cnxn.commit()
         cursor.close()

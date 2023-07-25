@@ -101,7 +101,7 @@ else:
                     ''',
                     row.RatingFID,
                     row.translatefid,
-                    row.Name_Translated,
+                    row.Name,
                     row.Remark,
                     row.IsActive,
                     row.Deleted,
@@ -117,7 +117,7 @@ else:
                         WHERE   RatingFID = ? 
                         and     LanguageFID = ?
                     ''',
-                    row.Name_Translated,
+                    row.Name,
                     row.RatingFID,
                     row.translatefid
                 )
@@ -151,8 +151,8 @@ else:
                     ''',
                     row.CancellationPoliciFID,
                     row.translatefid,
-                    row.Name_Translated,
-                    row.Term_Translated,
+                    row.Name,
+                    row.TermAndPolicies,
                     row.IsActive,
                     row.Deleted,
                     row.CreatedBy,
@@ -167,8 +167,8 @@ else:
                         WHERE   CancellationPoliciFID = ? 
                         and     LanguageFID = ?
                     ''',
-                    row.Name_Translated,
-                    row.Term_Translated,
+                    row.Name,
+                    row.TermAndPolicies,
                     row.CancellationPoliciFID,
                     row.translatefid
                 )
@@ -202,8 +202,8 @@ else:
                     ''',
                     row.PaymentPoliciFID,
                     row.translatefid,
-                    row.Name_Translated,
-                    row.Term_Translated,
+                    row.Name,
+                    row.TermAndPolicies,
                     row.IsActive,
                     row.Deleted,
                     row.CreatedBy,
@@ -218,8 +218,8 @@ else:
                         WHERE   PaymentPoliciFID = ? 
                         and     LanguageFID = ?
                     ''',
-                    row.Name_Translated,
-                    row.Term_Translated,
+                    row.Name,
+                    row.TermAndPolicies,
                     row.PaymentPoliciFID,
                     row.translatefid
                 )
@@ -252,8 +252,8 @@ else:
                     ''',
                     row.PricingFID,
                     row.translatefid,
-                    row.Name_Translated,
-                    row.Remark_Translated,
+                    row.Name,
+                    row.Remark,
                     row.Deleted,
                     row.CreatedBy,
                     row.LastModifiedBy
@@ -267,8 +267,8 @@ else:
                         WHERE   PricingFID = ? 
                         and     LanguageFID = ?
                     ''',
-                    row.Name_Translated,
-                    row.Remark_Translated,
+                    row.Name,
+                    row.Remark,
                     row.PricingFID,
                     row.translatefid
                 )
@@ -301,8 +301,8 @@ else:
                         VALUES (?,?,?,?,?,?,getdate(),?,getdate()-1,?)
                     ''',
                     row.TripPlanFID,
-                    row.ItemName_Translated,
-                    row.ItemDescription_Translated,
+                    row.ItemName,
+                    row.ItemDescription,
                     row.translatefid,
                     row.Deleted,
                     row.CreatedBy,
@@ -318,8 +318,8 @@ else:
                         WHERE   TripPlanFID = ? 
                         and     LanguageFID = ?
                     ''',
-                    row.ItemName_Translated,
-                    row.ItemDescription_Translated,
+                    row.ItemName,
+                    row.ItemDescription,
                     row.TripPlanFID,
                     row.translatefid
                 )
@@ -353,7 +353,7 @@ else:
                     ''',
                     row.TourTypeFID,
                     row.translatefid,
-                    row.Name_Translated,
+                    row.Name,
                     row.Remark,
                     row.IsActive,
                     row.Deleted,
@@ -368,7 +368,7 @@ else:
                         WHERE   TourTypeFID = ? 
                         and     LanguageFID = ?
                     ''',
-                    row.Name_Translated,
+                    row.Name,
                     row.TourTypeFID,
                     row.translatefid
                 )
@@ -410,9 +410,9 @@ else:
                     row.translatefid,
                     row.FileTypeFID,
                     row.FileStreamFID,
-                    row.Title_Translated,
-                    row.ShortDescriptions_Translated,
-                    row.FullDescriptions_Translated,
+                    row.Title,
+                    row.ShortDescriptions,
+                    row.FullDescriptions,
                     row.Deleted,
                     row.IsActivated,
                     row.ActivatedBy,
@@ -428,9 +428,9 @@ else:
                         WHERE   InformationFID = ? 
                         and     LanguageFID = ?
                     ''',
-                    row.Title_Translated,
-                    row.ShortDescriptions_Translated,
-                    row.FullDescriptions_Translated,
+                    row.Title,
+                    row.ShortDescriptions,
+                    row.FullDescriptions,
                     row.InformationFID,
                     row.translatefid
                 )
@@ -446,8 +446,8 @@ else:
                 )
 
         # Insert tracking log into Translate_Tracking_Log
-        commonfunction.insert_tracking_log()
-        commonfunction.insert_tracking_row_and_word()
+        if normal_df.isnull == 'False' or exception_df.isnull == 'False':
+            commonfunction.insert_tracking_row_and_word(normal_df, exception_df)
 
         cnxn.commit()
         cursor.close()
