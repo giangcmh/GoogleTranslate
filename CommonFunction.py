@@ -6,21 +6,33 @@ warnings.filterwarnings('ignore')
 
 class CommonFunction:
 
-    def __init__(self, databasename, tables, exception_tables, language,cnxn, translate_client):
+    def __init__(self, databasename, tables, exception_tables, language,cnxn, translate_client, translatecode_tables, translate_language_code):
         self.databasename = databasename
-        self.tables = tables
-        self.exception_tables = exception_tables
         self.language = language
+        self.translate_language_code = translate_language_code
         self.cnxn = cnxn
         self.translate_client = translate_client
+
+        #normal table
+        self.tables = tables
         self.translate_date = {}
-        self.exception_translate_date = {}
         self.insert_track = []
-        self.exception_insert_track = []
         self.normal_df = pd.DataFrame()
-        self.exception_df = pd.DataFrame()
         self.normal_list_column = []
+
+        #exception table
+        self.exception_tables = exception_tables
+        self.exception_translate_date = {}
+        self.exception_insert_track = []
+        self.exception_df = pd.DataFrame()
         self.exception_list_column = []
+
+        #translate code
+        self.translatecode_tables = translatecode_tables
+        self.translatecode_date = {}
+        self.translatecode_insert_track = []
+        self.translatecode_df = pd.DataFrame()
+        self.translatecode_list_column = []
 
     def get_last_translated_date(self):
         ### Normal Tables
@@ -68,6 +80,7 @@ class CommonFunction:
                                 ''', self.cnxn)
 
             self.exception_translate_date[key] = [df_exception_translate_date['LastTranlastedDate'][0], value[0]]
+
 
         return self.translate_date, self.exception_translate_date
 
@@ -168,11 +181,40 @@ class CommonFunction:
         else:
             self.exception_insert_track.append(1)
 
-        return self.normal_df, self.exception_df
+        if self.translatecode_tables != None:
+            for key, value in self.translate_language_code.items():
+                for translate_key, translate_value in self.translatecode_tables.items():
+                    ###Insert / 1 as is_insert
+                    translatecode_insert = pd.read_sql(
+                        f'''select	1 as is_insert,
+                                    '{key}' as db_translatecode,
+                                    '{value}' as language_translate,
+                                    '{translate_key}' as table_name,
+                                    0 as world_translated,
+                                    * 
+                            from	[dbo].[{translate_key}] A 
+                            where	LanguageCode = 'en-US'
+                            and     not exists (select 1 
+                                                from [dbo].[{translate_key}] B 
+                                                where A.{translate_value[0]} = B.{translate_value[0]} 
+                                                and B.LanguageCode = '{key}') 
+                            and		MusementTourID = 2
+
+                        '''
+                        , self.cnxn, index_col='Id')
+                    self.translatecode_df = pd.concat([self.translatecode_df, translatecode_insert], ignore_index=True)
+            # check insert into track log
+            if self.translatecode_df.empty:
+                self.translatecode_insert_track.append(0)
+            else:
+                self.translatecode_insert_track.append(1)
+
+
+        return self.normal_df, self.exception_df, self.translatecode_df
 
 
     def call_api_translate(self):
-        self.normal_df, self.exception_df = self.get_data_frame()
+        self.normal_df, self.exception_df, self.translatecode_df = self.get_data_frame()
         for key, value in self.tables.items():
             for i in range(0,len(value[1])):
                 self.normal_list_column.append(value[1][i])
@@ -180,6 +222,10 @@ class CommonFunction:
         for key, value in self.exception_tables.items():
             for i in range(0,len(value[1])):
                 self.exception_list_column.append(value[1][i])
+
+        for key, value in self.translatecode_tables.items():
+            for i in range(0,len(value[1])):
+                self.translatecode_list_column.append(value[1][i])
 
         for index, row in self.normal_df.iterrows():
             word_translated = 0
@@ -210,7 +256,22 @@ class CommonFunction:
                                                                         target_language=language_translate)
                     self.exception_df.at[index, f'{column_name}'] = output_description['translatedText']
             self.exception_df.at[index, 'after_word_translated'] = word_translated
-        return self.normal_df, self.exception_df
+
+        for index, row in self.translatecode_df.iterrows():
+            word_translated = 0
+            for i in range(0,len(self.translatecode_list_column)):
+                language_translate = row['language_translate']
+                column_name = self.translatecode_list_column[i]
+                text_description = row[f'{column_name}']
+                word_translated += len(text_description)
+                # process NULL data in column
+                if text_description != None:
+                    output_description = self.translate_client.translate(text_description,
+                                                                        target_language=language_translate)
+                    self.translatecode_df.at[index, f'{column_name}'] = output_description['translatedText']
+            self.translatecode_df.at[index, 'after_word_translated'] = word_translated
+
+        return self.normal_df, self.exception_df, self.translatecode_df
 
     def insert_tracking_log(self):
         cursor = self.cnxn.cursor()
@@ -243,7 +304,8 @@ class CommonFunction:
                         value[0]
                     )
 
-    def insert_tracking_row_and_word(self,normal_df, exception_df):
+
+    def insert_tracking_row_and_word(self,normal_df, exception_df, translatecode_df):
         # self.normal_df, self.exception_df = self.call_api_translate()
         tracking_normal_df = normal_df.groupby('table_name') \
                                             .agg({'is_insert': 'count',
@@ -256,6 +318,13 @@ class CommonFunction:
                                                           'after_word_translated': 'sum'}) \
                                                     .reset_index() \
                                                     .rename(columns={'is_insert': 'row_count'})
+
+        tracking_translatecode_df = translatecode_df.groupby('table_name') \
+                                                    .agg({'is_insert': 'count',
+                                                          'after_word_translated': 'sum'}) \
+                                                    .reset_index() \
+                                                    .rename(columns={'is_insert': 'row_count'})
+
         cursor = self.cnxn.cursor()
         # normal
         for index, row in tracking_normal_df.iterrows():
@@ -282,6 +351,22 @@ class CommonFunction:
                                                                                             [CreatedDate])
                             VALUES (?,?,?,?,getdate())
                         ''',
+                self.databasename,
+                row['table_name'],
+                row['row_count'],
+                row['after_word_translated']
+            )
+
+        # translatecode
+        for index, row in tracking_translatecode_df.iterrows():
+            cursor.execute(
+                f'''INSERT INTO [AQ_Configurations].[dbo].[Translate_Tracking_RowAndWord_Log]([Database_Name],
+                                                                                                [Table_Name],
+                                                                                                [Translated_Row],
+                                                                                                [Translated_Word],
+                                                                                                [CreatedDate])
+                                VALUES (?,?,?,?,getdate())
+                            ''',
                 self.databasename,
                 row['table_name'],
                 row['row_count'],

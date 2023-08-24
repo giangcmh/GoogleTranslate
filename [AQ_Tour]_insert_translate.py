@@ -11,15 +11,21 @@ pd.set_option('display.max_columns', None)  # show all columns in pandas datafra
 #################################################################
 # declare database name and table name
 databasename = 'AQ_Tour'
-normal_tables = {'RatingAttributeDetails': ['RatingFID', ['Name']],
-                 'TourCancelPoliMutilLang': ['CancellationPoliciFID', ['Name', 'TermAndPolicies']],
-                 'TourPaymentPoliMutilLang': ['PaymentPoliciFID', ['Name', 'TermAndPolicies']],
-                 'TourPricingDetails': ['PricingFID', ['Name', 'Remark']],
-                 'TourTripPlanDetail': ['TripPlanFID', ['ItemName', 'ItemDescription']],
-                 'TourTypeDetail': ['TourTypeFID', ['Name']]
+normal_tables = {
                  }
-exception_tables = {'TourInformationDetails': ['InformationFID', ['Title', 'ShortDescriptions', 'FullDescriptions']]
+exception_tables = {
                     }
+
+translatecode_tables = {'MusementTourTranslation': ['MusementTourID', ['Title', 'Description', 'About', 'MeetingPoint']]
+                        }
+
+translate_language_code = {
+    'zh-CN': 'zh-CN',
+    'th-TH': 'th',
+    'vi-VN': 'vi',
+    'zh-HK': 'zh-TW'
+}
+
 language = {
     2: "zh-CN",
     4: "th",
@@ -45,15 +51,10 @@ else:
         os.environ[
             'GOOGLE_APPLICATION_CREDENTIALS'] = r"D:\PythonProject\GoogleTranslate\elaborate-art-392802-e18eac2a2238.json"
 
-
-
         # init translate language
         translate_client = translate_v2.Client()
 
-
-
-
-        commonfunction = CommonFunction(databasename,normal_tables, exception_tables, language, cnxn, translate_client)
+        commonfunction = CommonFunction(databasename,normal_tables, exception_tables, language, cnxn, translate_client, translatecode_tables, translate_language_code)
 
         #################################################################  Get Last Translated Date
         translate_date, exception_translate_date = commonfunction.get_last_translated_date()
@@ -67,7 +68,7 @@ else:
         # print(exception_df.shape)
 
         ############################################################## Call Function Translate
-        normal_df, exception_df = commonfunction.call_api_translate()
+        normal_df, exception_df, translatecode_df = commonfunction.call_api_translate()
         # print(normal_df)
         # print(exception_df)
 
@@ -81,6 +82,7 @@ else:
         tourtripplandetail = normal_df[normal_df['table_name'] == 'TourTripPlanDetail']
         tourtypedetail = normal_df[normal_df['table_name'] == 'TourTypeDetail']
         tourinformationdetails = exception_df[exception_df['table_name'] == 'TourInformationDetails']
+        musementtourtranslation = translatecode_df[translatecode_df['table_name'] == 'MusementTourTranslation']
 
         # RatingAttributeDetails
         for index, row in ratingattributedetails.iterrows():
@@ -445,16 +447,36 @@ else:
                     1  # language en-US
                 )
 
+        # MusementTourTranslation
+        for index, row in musementtourtranslation.iterrows():
+            # Insert language missing
+            cursor.execute(
+                '''INSERT INTO [dbo].[MusementTourTranslation]([MusementTourId]
+                                                                ,[LanguageCode]
+                                                                ,[Title]
+                                                                ,[Description]
+                                                                ,[About]
+                                                                ,[MeetingPoint])
+                    VALUES (?,?,?,?,?,?)
+                ''',
+                row.MusementTourId,
+                row.db_translatecode,
+                row.Title,
+                row.Description,
+                row.About,
+                row.MeetingPoint
+            )
+
         # Insert tracking log into Translate_Tracking_Log
-        if normal_df.isnull == 'False' or exception_df.isnull == 'False':
-            commonfunction.insert_tracking_row_and_word(normal_df, exception_df)
+        if normal_df.isnull == 'False' or exception_df.isnull == 'False' or translatecode_df.isnull == 'False':
+            commonfunction.insert_tracking_row_and_word(normal_df, exception_df, translatecode_df)
 
         cnxn.commit()
         cursor.close()
     except:
         cursor = cnxn.cursor()
         cursor.execute(
-            f'''INSERT INTO [AQ_Configurations].[dbo].[Translate_Tracking_RowAndWord_Log]([Database_Name],
+            f'''INSERT INTO [AQ_Configurations].[dbo].[Translate_Tracking_Status_Log]([Database_Name],
                                                                                                     [Status],
                                                                                                     [CreatedDate])
                                     VALUES (?,?,getdate())
@@ -467,7 +489,7 @@ else:
     else:
         cursor = cnxn.cursor()
         cursor.execute(
-            f'''INSERT INTO [AQ_Configurations].[dbo].[Translate_Tracking_RowAndWord_Log]([Database_Name],
+            f'''INSERT INTO [AQ_Configurations].[dbo].[Translate_Tracking_Status_Log]([Database_Name],
                                                                                                         [Status],
                                                                                                         [CreatedDate])
                                         VALUES (?,?,getdate())
